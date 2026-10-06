@@ -22,6 +22,16 @@ class TicketController extends BaseController
 
     public function store()
     {
+        $rule = [
+            'title' => 'required|min_length[3]|max_length[255]',
+            'description' => 'required|min_length[10]|max_length[500]',
+            'priority' => 'required|in_list[Low, Medium, High]'
+        ];
+
+        if (!$this->validate($rule)) {
+                return view('tickets/create', ['validation' => $this->validator]);
+            }
+
         $ticketModel = new TicketModel();
 
         $ticketModel->insert([
@@ -31,6 +41,7 @@ class TicketController extends BaseController
             'status' => 'Open'
         ]);
 
+        session()->setFlashdata('success', 'Ticket created successfully.');
         return redirect()->to('/tickets');
     }
 
@@ -38,6 +49,10 @@ class TicketController extends BaseController
     {
         $ticketModel = new TicketModel();
         $ticket = $ticketModel->find($id);
+
+        if(!$ticket){
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
+        }
 
         return view('tickets/show', ['ticket'=>$ticket]);
     }
@@ -47,6 +62,10 @@ class TicketController extends BaseController
         $ticketModel = new TicketModel();
         $ticket = $ticketModel->find($id);
         
+        if(!$ticket){
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
+        }
+        session()->setFlashdata('success', 'Ticket edit successfully.');
         return view('tickets/edit', ['ticket'=>$ticket]);
     }
 
@@ -70,6 +89,11 @@ class TicketController extends BaseController
 
         $ticket = $ticketModel->delete($id);
 
+        if(!$ticket){
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
+        }
+
+        session()->setFlashdata('success', 'Ticket deleted successfully.');
         return redirect()->to('/tickets');
     }
 }

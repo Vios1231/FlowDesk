@@ -6,7 +6,13 @@
 <body>
 
     <h1>Tickets</h1>
-
+    
+    <?php if (session()->getFlashdata('success')): ?>
+        <div>
+            <?= session()->getFlashdata('success') ?>
+        </div>
+    <?php endif; ?>
+    
     <?php foreach ($tickets as $ticket): ?>
 
         <div>

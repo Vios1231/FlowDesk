@@ -6,6 +6,12 @@
 <body>
 
     <h1>Create Ticket</h1>
+    
+    <?php if (isset($validation)): ?>
+        <div>
+            <?= $validation->listErrors() ?>
+        </div>
+    <?php endif; ?>
 
     <form action="/tickets/store" method="post">
 
