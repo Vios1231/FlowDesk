@@ -6,6 +6,14 @@
 <body>
 
     <h1>Edit Ticket</h1>
+    
+    <?php if (!empty($validation)): ?>
+        <div>
+            <?php foreach ($validation as $error): ?>
+                <p><?= esc($error) ?></p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <form action="/tickets/<?= $ticket['id'] ?>/update" method="post">
 
@@ -14,7 +22,7 @@
             <input
                 type="text"
                 name="title"
-                value="<?= $ticket['title'] ?>"
+                value="<?= esc($ticket['title']) ?>"
                 required
             >
         </div>
@@ -23,7 +31,7 @@
 
         <div>
             <label>Description</label>
-            <textarea name="description" required><?= $ticket['description'] ?></textarea>
+            <textarea name="description" required><?= esc($ticket['description']) ?></textarea>
         </div>
 
         <br>

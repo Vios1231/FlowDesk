@@ -22,24 +22,20 @@ class TicketController extends BaseController
 
     public function store()
     {
-        $rule = [
-            'title' => 'required|min_length[3]|max_length[255]',
-            'description' => 'required|min_length[10]|max_length[500]',
-            'priority' => 'required|in_list[Low, Medium, High]'
-        ];
-
-        if (!$this->validate($rule)) {
-                return view('tickets/create', ['validation' => $this->validator]);
-            }
-
         $ticketModel = new TicketModel();
 
-        $ticketModel->insert([
+        $result = $ticketModel->insert([
             'title' => $this->request->getPost('title'),
             'description' => $this->request->getPost('description'),
             'priority' => $this->request->getPost('priority'),
             'status' => 'Open'
         ]);
+
+        if ($result === false) {
+            return view('tickets/create', [
+                'validation' => $ticketModel->errors()
+            ]);
+        }
 
         session()->setFlashdata('success', 'Ticket created successfully.');
         return redirect()->to('/tickets');
@@ -65,32 +61,49 @@ class TicketController extends BaseController
         if(!$ticket){
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
         }
-        session()->setFlashdata('success', 'Ticket edit successfully.');
+        
         return view('tickets/edit', ['ticket'=>$ticket]);
     }
 
     public function update($id)
     {
         $ticketModel = new TicketModel();
+        $ticket = $ticketModel->find($id);
+        
+        if(!$ticket){
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
+        }
 
-        $ticketModel->update($id, [
+        $result = $ticketModel->update($id, [
             'title' => $this->request->getPost('title'),
             'description' => $this->request->getPost('description'),
             'priority' => $this->request->getPost('priority'),
             'status' => $this->request->getPost('status'),
         ]);
 
+        if ($result === false) {
+            return view('tickets/edit', [
+                'ticket' => array_merge($ticket, $this->request->getPost()),
+                'validation' => $ticketModel->errors()
+            ]);
+        }
+        
+        session()->setFlashdata('success', 'Ticket updated successfully.');
         return redirect()->to('/tickets/' . $id);
     }
 
     public function delete($id)
     {
         $ticketModel = new TicketModel();
-
-        $ticket = $ticketModel->delete($id);
+        $ticket = $ticketModel->find($id);
 
         if(!$ticket){
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ticket not found.');
+        }
+
+        $result = $ticketModel->delete($id);
+        if ($result === false) {
+            throw new \RuntimeException('Failed to delete ticket.');
         }
 
         session()->setFlashdata('success', 'Ticket deleted successfully.');

@@ -9,7 +9,9 @@
     
     <?php if (isset($validation)): ?>
         <div>
-            <?= $validation->listErrors() ?>
+            <?php foreach ($validation as $error): ?>
+                <p><?= $error ?></p>
+            <?php endforeach; ?>
         </div>
     <?php endif; ?>
 
