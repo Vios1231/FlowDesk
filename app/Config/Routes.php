@@ -6,11 +6,16 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('/home', 'HomeController::index');
 
-$routes->get('/tickets', 'TicketController::index');
-$routes->get('/tickets/create', 'TicketController::create');
-$routes->post('tickets/store', 'TicketController::store');
-$routes->get('/tickets/(:num)', 'TicketController::show/$1');
+$routes->group('', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/tickets', 'TicketController::index');
+    $routes->get('/tickets/create', 'TicketController::create');
+    $routes->post('/tickets/store', 'TicketController::store');
+    $routes->get('/tickets/(:num)', 'TicketController::show/$1');
+    $routes->get('/tickets/(:num)/edit', 'TicketController::edit/$1', ['filter' => 'role:admin']);
+    $routes->post('/tickets/(:num)/update', 'TicketController::update/$1', ['filter' => 'role:admin']);
+    $routes->post('/tickets/(:num)/delete', 'TicketController::delete/$1', ['filter' => 'role:admin']);
+});
 
-$routes->get('/tickets/(:num)/edit', 'TicketController::edit/$1');
-$routes->post('/tickets/(:num)/update', 'TicketController::update/$1');
-$routes->post('/tickets/(:num)/delete', 'TicketController::delete/$1');
+$routes->get('/login', 'AuthController::login');
+$routes->post('/login', 'AuthController::attemptLogin');
+$routes->post('/logout', 'AuthController::logout');

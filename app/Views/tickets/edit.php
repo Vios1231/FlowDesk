@@ -1,96 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FlowDesk - Edit Ticket</title>
-</head>
-<body>
 
-    <h1>Edit Ticket</h1>
-    
-    <?php if (!empty($validation)): ?>
-        <div>
-            <?php foreach ($validation as $error): ?>
-                <p><?= esc($error) ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+<?= $this->extend('layouts/main') ?>
 
-    <form action="/tickets/<?= $ticket['id'] ?>/update" method="post">
+<?= $this->section('content') ?>
 
-        <div>
-            <label>Title</label>
-            <input
-                type="text"
-                name="title"
-                value="<?= esc($ticket['title']) ?>"
-                required
-            >
-        </div>
+<div class="mb-4">
+    <h1 class="h3 mb-1">Edit Ticket</h1>
+    <p class="text-secondary mb-0">
+        Update the information for this ticket.
+    </p>
+</div>
 
-        <br>
+<div class="card content-card">
+    <div class="card-body p-4">
 
-        <div>
-            <label>Description</label>
-            <textarea name="description" required><?= esc($ticket['description']) ?></textarea>
-        </div>
+        <?php if (session()->getFlashdata('errors')): ?>
+            <div class="alert alert-danger">
+                <strong>Please fix the following errors:</strong>
+                <ul class="mb-0 mt-2">
+                    <?php foreach (session()->getFlashdata('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
 
-        <br>
+        <form action="<?= site_url('tickets/' . $ticket['id'] . '/update') ?>" method="post">
+            <?= csrf_field() ?>
 
-        <div>
-            <label>Priority</label>
-            <select name="priority">
+            <div class="mb-3">
+                <label for="title" class="form-label">Ticket Title</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="title"
+                    name="title"
+                    value="<?= esc(old('title') ?? $ticket['title']) ?>"
+                    required
+                >
+            </div>
 
-                <option value="Low"
-                    <?= $ticket['priority'] === 'Low' ? 'selected' : '' ?>>
-                    Low
-                </option>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                    class="form-control"
+                    id="description"
+                    name="description"
+                    rows="5"
+                    required
+                ><?= esc(old('description') ?? $ticket['description']) ?></textarea>
+            </div>
 
-                <option value="Medium"
-                    <?= $ticket['priority'] === 'Medium' ? 'selected' : '' ?>>
-                    Medium
-                </option>
+            <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select
+                    class="form-select"
+                    id="priority"
+                    name="priority"
+                    required
+                >
+                    <option value="Low" <?= old('priority', $ticket['priority']) === 'Low' ? 'selected' : '' ?>>Low</option>
+                    <option value="Medium" <?= old('priority', $ticket['priority']) === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                    <option value="High" <?= old('priority', $ticket['priority']) === 'High' ? 'selected' : '' ?>>High</option>
+                </select>
+            </div>
 
-                <option value="High"
-                    <?= $ticket['priority'] === 'High' ? 'selected' : '' ?>>
-                    High
-                </option>
+            <div class="mb-4">
+                <label for="status" class="form-label">Status</label>
+                <select
+                    class="form-select"
+                    id="status"
+                    name="status"
+                    required
+                >
+                    <option value="Open" <?= old('status', $ticket['status']) === 'Open' ? 'selected' : '' ?>>Open</option>
+                    <option value="In Progress" <?= old('status', $ticket['status']) === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                    <option value="Resolved" <?= old('status', $ticket['status']) === 'Resolved' ? 'selected' : '' ?>>Resolved</option>
+                </select>
+            </div>
 
-            </select>
-        </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    Save Changes
+                </button>
 
-        <br>
+                <a href="<?= site_url('tickets') ?>" class="btn btn-light border">
+                    Cancel
+                </a>
+            </div>
+        </form>
 
-        <div>
-            <label>Status</label>
-            <select name="status">
+    </div>
+</div>
 
-                <option value="Open"
-                    <?= $ticket['status'] === 'Open' ? 'selected' : '' ?>>
-                    Open
-                </option>
-
-                <option value="In Progress"
-                    <?= $ticket['status'] === 'In Progress' ? 'selected' : '' ?>>
-                    In Progress
-                </option>
-
-                <option value="Resolved"
-                    <?= $ticket['status'] === 'Resolved' ? 'selected' : '' ?>>
-                    Resolved
-                </option>
-
-            </select>
-        </div>
-
-        <br>
-
-        <button type="submit">Update Ticket</button>
-
-    </form>
-
-    <br>
-
-    <a href="/tickets/<?= $ticket['id'] ?>">Cancel</a>
-
-</body>
-</html>
+<?= $this->endSection() ?>
